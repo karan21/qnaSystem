@@ -1,0 +1,91 @@
+{{extend 'layout.html'}}{{i=0}}
+<div class="container">
+    <div class="row">
+        <div class="col-sm-9">
+        </div>
+        <div class="col-sm-3" style="padding-left:3%">
+           <ul class="nav nav-pills" style="margin-left:43%">
+              <li role="presentation" class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                    <span class="glyphicon glyphicon-filter"></span> Category
+                </a>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                {{ rows = db().select(db.category.ALL) }}
+                {{if len(rows):}}
+                    {{ for r in rows: }}
+                    <li>
+    <!--                     <a href="view_question/0/{{=r.category_name}}"> -->
+                        {{=A(r.category_name, _href = URL('index/0',args=r.category_name))}}
+    <!-- 				{{=r.category_name}} -->
+                    </a>
+                    </li>
+                    {{pass}}
+                    {{pass}}
+            </ul>
+          </li>
+          </ul>
+</div>
+</div>
+<div class="container">
+{{for question in questions:}}
+<div class="panel panel-primary">
+   <div class="panel-heading" style="color:white;">
+      {{A(question.question_title, _href = URL('view_question',args=question.id))}}
+       <a href="{{=URL('view_question',args=question.id)}}" style="color:white" >{{=question.question_title}}</a>
+   </div>
+   <div class="panel-body" style="max-height: 10;">
+      <div class="row">
+         <div class="row">
+<!--             <div class="col-sm-1"></div> -->
+            <div class="col-sm-12" style="padding-left:40px;padding-right:30px">
+                {{=XML(question.question_body, sanitize=False)}}
+                {{question.question_body}}
+            </div>
+          </div>
+          <div class="row ">
+              <div class="col-md-4">
+                  <div class="row">
+                      <div class="col-sm-1"> </div>
+                   <div class="col-sm-3">
+                       <h4><span class="label label-default">Votes <span class="badge" style="background-color:white;color:black">{{=question.question_vote}}</span></span></h4>
+                  </div>
+                  <div class="col-sm-3">
+                     <h4><span class="label label-success">Views <span class="badge" style="background-color:white;color:black">{{=question.question_click_count}}</span></span></h4>
+                  </div>
+                   <div class="col-sm-3">
+                       <h4><span class="label label-warning">Answers <span class="badge" style="background-color:white;color:black">{{=list[i]}}</span></span></h4>
+                  </div>
+                  </div>
+              </div>
+              <div class="col-md-8" style="padding-right:25px;padding-top:5px;text-align:right">
+                  - {{=author(question.created_by)}} posted {{=prettydate(question.created_on)}}{{i=i+1}}
+              </div>
+          </div>
+         </div>
+      </div>
+   </div>
+   {{pass}}
+   <div class="container">
+      <ul class="pager">
+          {{=page}}
+          {{=len(questions)}}
+          {{if page >= 1:}}
+         <li>{{=A('previous',_href=URL(args=page-1))}}</li>
+          {{pass}}
+          {{if len(questions) == 10:}}
+         <li> {{=A('Next',_href=URL(args=page+1))}}</li>
+          {{pass}}
+      </ul>
+   </div>
+   <!--     <div class="row" style="margin-top:10px; margin-bottom:20px">
+      <div class="col-sm-1"> </div>
+      {{if page>0:}}
+          {{=A('Previous',_class='btn btn-default',_href=URL(args=page-1))}}
+          {{pass}}
+      {{if len(questions)>=10:}}
+      <span style="margin-left:10px">
+          {{=A('Next',_class='btn btn-default',_href=URL(args=page+1))}}
+          {{pass}}
+      </span>
+      </div> -->
+</div>

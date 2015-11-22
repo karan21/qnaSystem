@@ -1,0 +1,11 @@
+{{extend 'layout.html'}}
+
+<h2>Upload file</h2>
+{{=form}}
+
+
+{{ if url != "": }}
+<script type="text/javascript">
+  window.opener.CKEDITOR.tools.callFunction({{=cknum}}, '{{=url}}');
+</script>
+{{ pass }}

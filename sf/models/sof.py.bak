@@ -1,0 +1,75 @@
+# -*- coding: utf-8 -*-
+from plugin_ckeditor import CKEditor
+ckeditor = CKEditor(db)
+ckeditor.define_tables()
+db.define_table('category',
+               Field('category_name'),requires=(IS_SLUG,IS_LOWER,IS_NOT_IN_DB(db,'category.category_name')))
+
+db.define_table('question',
+				Field('category_id','reference category',readable=False,writable=False),
+                Field('question_title','string',requires=IS_NOT_EMPTY()),
+                Field('question_vote','integer',default=0,readable=False,writable=False),
+                Field('question_body','text',requires=IS_NOT_EMPTY(),widget=ckeditor.widget),
+                Field('question_click_count','integer',default=0,readable=False,writable=False),
+                auth.signature)
+
+db.define_table('question_vote',
+                Field('question_id','reference question'),
+                Field('question_score','integer',default=+1),
+                auth.signature)
+
+db.define_table('answer',
+				Field('question_id','reference question',readable=False,writable=False),
+				Field('answer_vote','integer',default=0,readable=False,writable=False),
+				Field('answer_body','text',requires=IS_NOT_EMPTY()),
+                auth.signature)
+
+db.define_table('answer_vote',
+                Field('answer_id','reference answer',readable=False,writable=False),
+                Field('answer_score','integer',default=+1),
+                auth.signature)
+
+db.define_table('comm',
+                Field('answer_id','reference answer',readable=False,writable=False),
+                Field('parent_comm','reference comm',readable=False,writable=False),
+                Field('comm_vote','integer',readable=False,writable=False),
+                Field('comm_body','text',requires=IS_NOT_EMPTY()),
+                auth.signature)
+
+db.define_table('comm_vote',
+                Field('comm_id','reference comm'),
+                Field('comm_score','integer',default=+1),
+                auth.signature)
+
+db.define_table('bookmark',
+                Field('question_id','reference question'),
+                auth.signature)
+
+def author(id):
+    if id is None:
+        return "Unknown"
+    else:
+        user=db.auth_user(id)
+        return A('%(first_name)s %(last_name)s' %user,_href=URL('view_user',args=user.id))
+
+def firstname(id):
+    if id is None:
+        return "Unknown"
+    else:
+        user=db.auth_user(id)
+        return '%(first_name)s' %user
+    
+def lastname(id):
+    if id is None:
+        return "Unknown"
+    else:
+        user=db.auth_user(id)
+        return '%(last_name)s' %user
+
+from gluon.contrib.populate import populate
+if db(db.auth_user).count()<2:
+    populate(db.auth_user,100)
+    db.commit()
+if db(db.question).count()<2:
+    populate(db.question,500)
+    db.commit()

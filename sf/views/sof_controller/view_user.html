@@ -1,0 +1,82 @@
+{{extend 'layout.html'}}
+<div class="container">
+  <h2>{{
+           answer_id=request.args(0,cast=int)
+           full_name=str(firstname(answer_id))+" "+str(lastname(answer_id))
+           =full_name
+      }}</h2>
+  <ul class="nav nav-tabs">
+    <li class="active"><a data-toggle="tab" href="#questions">Questions</a></li>
+    <li><a data-toggle="tab" href="#answers">Answers</a></li>
+    <li><a data-toggle="tab" href="#bookmarks">Bookmarks</a></li>
+  </ul>
+
+  <div class="tab-content">
+    <div id="questions" class="tab-pane fade in active">
+      {{index = 0}}
+      {{for question in questions:}}
+        {{index = index+1}}
+         <div class="row">
+            <div class="col-sm-12">
+                <h4>
+                    {{=A(question.question_title, _href = URL('view_question',args=question.id))}}
+                </h4>
+            </div>
+        </div>
+        <div class="row well-sm">
+            <div class="col-sm-11">
+                {{question.question_body}}
+                {{=XML(question.question_body, sanitize=False)}}
+            </div>
+        </div>
+        {{if len(questions) != index:}}
+            <hr style="color:#848484; height:1px; background-color:#848484 "/>
+        {{pass}}
+        {{pass}}
+    </div>
+    <div id="answers" class="tab-pane fade">
+     {{index = 0}}
+      {{for answered_question in answered_questions:}}
+        {{index = index+1}}
+         <div class="row">
+            <div class="col-sm-12">
+                <h4>
+                    {{=A(answered_question.question_title, _href = URL('view_question',args=answered_question.id))}}
+                </h4>
+            </div>
+        </div>
+        <div class="row well-sm">
+            <div class="col-sm-11">
+                {{answered_question.question_body}}
+                {{=XML(answered_question.question_body, sanitize=False)}}
+            </div>
+        </div>
+        {{if len(answered_questions) != index:}}
+            <hr style="color:#848484; height:1px; background-color:#848484 "/>
+        {{pass}}
+        {{pass}}
+    </div>
+    <div id="bookmarks" class="tab-pane fade">
+      {{index = 0}}
+      {{for following_question in following_questions:}}
+        {{index = index+1}}
+         <div class="row">
+            <div class="col-sm-12">
+                <h4>
+                    {{=A(following_question.question_title, _href = URL('view_question',args=following_question.id))}}
+                </h4>
+            </div>
+        </div>
+        <div class="row well-sm">
+            <div class="col-sm-11">
+                {{following_question.question_body}}
+                {{=XML(following_question.question_body, sanitize=False)}}
+            </div>
+        </div>
+        {{if len(following_questions) != index:}}
+            <hr style="color:#848484; height:1px; background-color:#848484 "/>
+        {{pass}}
+        {{pass}}
+    </div>
+  </div>
+</div>

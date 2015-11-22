@@ -1,0 +1,277 @@
+{{extend 'layout.html'}}
+<div class="container">
+   <div class="panel panel-primary" style="margin-bottom: 10px; margin-left:10px; width:100%">
+      <div class="panel-heading">{{=post.question_title}}</div>
+      <div class="panel-body" style="max-height: 10;padding-left:10px;padding-bottom:7px;">
+         <div class="row ">
+            <div class="col-sm-1">
+               <div class="row well-sm" style="padding: 3px; padding-left:15px">
+                  <button type="button" class="btn btn-default btn-sm" id="plus" onclick="ajax('{{=URL('vote_answer',args=(post.id,'up'))}}',[],'{{=post.id}}')">
+                  <span class="glyphicon glyphicon-thumbs-up"></span>
+                  </button>
+                  <div id="{{=post.id}}" style="font-weight: bold; font-size: 15px; margin-left:15px; font-color:red ;margin-top:3px">
+                     {{=post.question_vote}}
+                  </div>
+               </div>
+               <div class="row well-sm" style="padding: 3px; padding-left:15px">
+                  <button type="button" class="btn btn-default btn-sm" id="minus" onclick="ajax('{{=URL('vote_answer',args=(post.id,'dw'))}}',[],'{{=post.id}}')">
+                  <span class="glyphicon glyphicon-thumbs-down"></span>
+                  </button>
+               </div>
+            </div>
+            <div class="col-sm-11 ">
+                 {{=XML(post.question_body, sanitize=False)}}
+                {{post.question_body}}
+            </div>
+         </div>
+         <div class="row well-sm " style="padding: 3px">
+             <div class="col-sm-1">
+             </div>
+             {{if(auth.user.first_name==firstname(post.created_by)):}}
+             <div class="col-sm-1" id="edit">
+                 <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#myModal"><span class="glyphicon glyphicon-pencil"></span>Edit</button>
+             </div>
+             <div class="col-sm-1" id="delete" style="padding-left:0px">
+<!--                  <button type="button" class="btn btn-default btn-sm" href = "{{=URL('dele_question',args=post.id)}}"><span class="glyphicon glyphicon-remove"></span>Delete</button> -->
+                 <a class="btn btn-sm btn-default" href = "{{=URL('dele_question',args=post.id)}}" >
+                     <span class="glyphicon glyphicon-remove"></span>
+                     Delete
+                 </a>
+             </div>
+            <div class="col-sm-6" id="bookmark" style="padding-left:0px">
+               {{if isFollowing == 0:}}
+                <button type="button" class="btn btn-default btn-sm" onclick="ajax('{{=URL('bookmark',args=(post.id,'follow'))}}',[],'bookmark')"><span class="glyphicon glyphicon-star-empty"></span> Bookmark</button>
+               {{else:}}
+                <button type="button" class="btn btn-default btn-sm" onclick="ajax('{{=URL('bookmark',args=(post.id,'unfollow'))}}',[],'bookmark')"><span class="glyphicon glyphicon-star"></span> Remove Bookmark </button>
+               {{pass}}
+           </div>
+             {{else:}}
+             <div class="col-sm-8" id="bookmark" style="padding-left:0px">
+               {{if isFollowing == 0:}}
+                <button type="button" class="btn btn-default btn-sm" onclick="ajax('{{=URL('bookmark',args=(post.id,'follow'))}}',[],'bookmark')"><span class="glyphicon glyphicon-star-empty"></span> Bookmark</button>
+               {{else:}}
+                <button type="button" class="btn btn-default btn-sm" onclick="ajax('{{=URL('bookmark',args=(post.id,'unfollow'))}}',[],'bookmark')"><span class="glyphicon glyphicon-star"></span> Remove Bookmark </button>
+               {{pass}}
+           </div>
+             {{pass}}
+             <div class="col-sm-3 " style="text-align:right">
+               - {{=author(post.created_by)}} posted {{=prettydate(post.created_on)}}
+            </div>
+         </div>
+     </div>
+   </div>
+<script src="{{=URL('static','plugin_ckeditor/ckeditor.js')}}"></script>
+<!-- <script src="//cdn.ckeditor.com/4.5.5/standard/ckeditor.js"></script> -->
+  <!-- Modal -->
+<div class="modal fade" id="myModal" role="dialog">
+<div class="modal-dialog" style="width:85%">
+   <!-- Modal content-->
+   <div class="modal-content">
+      <div class="modal-header">
+         <button type="button" class="close" data-dismiss="modal">&times;</button>
+         <h4 class="modal-title">Edit Question</h4>
+      </div>
+      <div class="modal-body">
+         <form action="{{=URL('edit_question')}}">
+            <div class="row">
+               <input value="{{=post.id}}" type="hidden" name="hid_id"/>
+               <div class="col-sm-2">
+                  Question Title
+               </div>
+               <div class="col-sm-8" style="width:65%">
+                  <textarea rows="1" cols="50" name="title">{{=post.question_title}}</textarea>
+               </div>
+            </div>
+            <div class="row">
+               <div class="col-sm-2">
+                  Question Text
+               </div>
+               <div class="col-sm-2" style="width:65%">
+                  <textarea rows="5" id="ques_body" cols="50" name="body">{{=XML(post.question_body, sanitize=False)}}</textarea>
+                   <script type="text/javascript">
+                    //CKEDITOR.replace( 'body' );
+                       var ckeditor = CKEDITOR.replace('body', {
+  filebrowserBrowseUrl : "{{=URL(request.application, c='plugin_ckeditor', f='browse')}}",
+  filebrowserUploadUrl : "{{=URL(request.application, c='plugin_ckeditor', f='upload')}}",
+});
+                 </script>
+               </div>
+            </div>
+            <div class="modal-footer">
+               <div class="row">
+                  <div class= "col-sm-3">
+                     <input type="submit" value="Submit">    
+                  </div>
+                  <div class= "col-sm-3">
+                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                  </div>
+               </div>
+         </form>
+         </div>
+      </div>
+   </div>
+</div>
+</div><div class="container">
+<h4> <div class="col-sm-0" style="margin-right:100px">
+            </div>
+    <h3><span class="label label-default">Total Answers: {{=len(answers)}}</span></h3>
+</h4><hr style="width: 100%; color: black; height: 1px; background-color:black;" />
+</div>
+<div class="container">
+    {{index = 0}}
+   {{for answer in answers:}}
+   <div class="row well-sm" style="padding: 3px;">
+      <div class="col-sm-1">
+         <div class="row well-sm" style="padding: 3px; padding-left:10px">
+            <button type="button" class="btn btn-default btn-sm" id="plus" onclick="ajax('{{=URL('vote_question',args=(answer.id,'up'))}}',[],'{{=answer.id}}')">
+            <span class="glyphicon glyphicon-thumbs-up"></span>
+            </button>
+         </div>
+         <div id="{{=answer.id}}" style="font-weight: bold; font-size: 15px; margin-left:3px; font-color:red ;margin-top:2px;padding-left:5px">
+            {{=answer.answer_vote}}
+         </div>
+         <div class="row well-sm" style="padding: 3px;padding-left:10px" >
+            <button type="button" class="btn btn-default btn-sm" id="minus" onclick="ajax('{{=URL('vote_question',args=(answer.id,'dw'))}}',[],'{{=answer.id}}')">
+            <span class="glyphicon glyphicon-thumbs-down"></span>
+            </button>
+         </div>
+      </div>
+      <div class="col-sm-11" >
+         {{=XML(answer.answer_body, sanitize=False)}}
+          {{answer.answer_body}}
+      </div>
+   </div>
+    {{comment_div = "comment-form"+str(answer.id)}}
+   <div class="row">
+       <div class="col-sm-1">
+       </div>
+       {{answer_div = "answer-form"+str(answer.id)}}
+       {{ans_mod="myModal"+str(answer.id)}}
+       {{if(auth.user.first_name==firstname(answer.created_by)):}}
+       <div class="col-sm-1">
+            <a data-toggle="modal" data-target="#{{=ans_mod}}"><span class="glyphicon glyphicon-pencil"></span>Edit</button>
+       </div>
+       <div class="col-sm-1">
+            <a href="{{=URL('dele_answer',args=answer.id)}}"><span class="glyphicon glyphicon-remove"></span>Delete</button>
+       </div>
+      <div class="col-sm-2">
+          <a data-toggle="collapse" data-target="#{{=comment_div}}"><span class="glyphicon glyphicon-plus"></span>Add Comment</a>
+      </div>
+      <div class="col-sm-7" style="text-align:right">
+         - {{=author(answer.created_by)}} on {{=prettydate(answer.created_on)}}
+      </div>
+       {{else:}}
+       <div class="col-sm-2">
+          <a data-toggle="collapse" data-target="#{{=comment_div}}"><span class="glyphicon glyphicon-plus"></span>Add Comment</a>
+      </div>
+      <div class="col-sm-9" style="text-align:right">
+         - {{=author(answer.created_by)}} on {{=prettydate(answer.created_on)}}
+      </div>
+       
+       {{pass}}
+   </div>
+
+    {{if(len(comments[index])):}}
+       <hr style="color: #9B9595; height: 1px; background-color:#9B9595;">
+    {{pass}}
+      <!-- Modal -->
+  <div class="modal fade" id="{{=ans_mod}}" role="dialog">
+    <div class="modal-dialog" style="width:85%">
+    
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Edit Answer</h4>
+        </div>
+        <div class="modal-body">
+          <form action="{{=URL('edit_answer')}}">
+              <table>
+                  <input value="{{=answer.question_id}}" type="hidden" name="q_id"/>
+                  <input value="{{=answer.id}}" type="hidden" name="ans_id"/>
+            <tr><td>Answer Body</td><td><textarea rows="5" cols="50" id = "edit_ans" name="up_ans">{{=answer.answer_body}}</textarea>
+                <script type="text/javascript">
+                    //CKEDITOR.replace( 'edit_ans' );
+                    var ckeditor = CKEDITOR.replace('edit_ans', {
+  filebrowserBrowseUrl : "{{=URL(request.application, c='plugin_ckeditor', f='browse')}}",
+  filebrowserUploadUrl : "{{=URL(request.application, c='plugin_ckeditor', f='upload')}}",
+});
+                 </script>
+                </td></tr>
+               <div class="modal-footer">
+                  <tr><td><input type="submit" value="Submit"></td>
+                  <td>
+                      <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                  </td>
+                  </tr>
+                  </div>
+              </table>
+              
+            </form>
+        </div>
+        
+      </div>
+      
+    </div>
+  </div>
+    <div id="{{=comment_div}}" class="row collapse">
+       <form action="{{=URL('add_comment')}}" method="post">
+         <div class="col-lg-5">
+            <textarea name="comment" rows="2" cols="50" > </textarea>
+         </div>
+           <input type="hidden" name="ques_id" value="{{=post.id}}">
+         <input type="hidden" name="answer_id" value="{{=answer.id}}">
+         <div class="col-lg-3">
+            <input type="submit" value="Submit Comment" class="btn btn-primary">
+         </div>
+      </form>
+    </div>
+     {{j = 0}}
+     {{for comment in comments[index]:}}
+         {{j = j+1}}
+    <div class = "row well-sm" style="padding-bottom:0px; padding-top:0px;margin-top:0px;margin-bottom:0px">
+        <div class="col-sm-2"> </div>
+        <div class="col-sm-8 small">
+            <i>{{=comment.comm_body}}</i>
+        </div>
+        <div class="row">
+            <div class="col-sm-8">            </div>
+           <div class="col-sm-4 small" style="text-align:right">
+         - {{=author(comment.created_by)}} posted {{=prettydate(comment.created_on)}}
+           </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-2"> </div>
+            <div class="col-sm-10">
+                {{if len(comments[index])!=j :}}
+                    <hr style="color: #C8C3C3; height: 1px; background-color:#C8C3C3;" />
+                {{pass}}
+            </div>
+        </div>
+    </div>
+    {{pass}}
+    {{index = index +1}}
+    <hr style="width: 100%; color: black; height: 1px; background-color:black;" />
+   {{pass}}
+   <div class="row well-sm">
+      Your Answer
+   </div>
+   <div class="row" style="margin-bottom:50px">
+      <form action="{{=URL('add_answer')}}" method="post">
+         <div class="col-lg-9">
+            <textarea name="answer" id="answer1" rows="10" cols="120" > </textarea>
+             <script type="text/javascript">
+                    //CKEDITOR.replace( 'answer1' );
+                 var ckeditor = CKEDITOR.replace('answer', {
+  filebrowserBrowseUrl : "{{=URL(request.application, c='plugin_ckeditor', f='browse')}}",
+  filebrowserUploadUrl : "{{=URL(request.application, c='plugin_ckeditor', f='upload')}}",
+});
+             </script>
+         </div>
+         <input type="hidden" name="question_id" value="{{=post.id}}">
+         <div class="col-lg-3">
+            <input type="submit" value="Submit Answer" class="btn btn-primary">
+         </div>
+      </form>
+   </div>
+</div>

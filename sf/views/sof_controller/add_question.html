@@ -1,0 +1,121 @@
+{{extend 'layout.html'}}
+<div class="container">
+    <div class="row" style="margin-left:12%;margin-right:15%">
+        <b>Category</b>   
+    
+    <div class="btn-group" style="margin-left:6%">
+    <div class="btn-group">
+      <button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown">
+     Select Category <span class="caret"></span></button>
+      <ul class="dropdown-menu" role="menu">
+       {{ rows = db().select(db.category.ALL) }}
+			{{if len(rows):}}
+			    {{ for r in rows: }}
+			    <li>
+                    {{=A(r.category_name,_href = URL('add_question',args=r.category_name))}}
+				</a>
+			    </li>
+			    {{pass}}
+			    {{pass}}
+      </ul>
+    </div>
+    <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModal">Add New Category</button>
+  </div>
+    
+    
+    
+    
+    
+    
+    <div class="row">
+       <ul class="nav nav-pills">
+<!--           <li role="presentation" class="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+             View Category
+            </a>
+		<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+			{{ rows = db().select(db.category.ALL) }}
+			{{if len(rows):}}
+			    {{ for r in rows: }}
+			    <li>
+                    {{=A(r.category_name,_href = URL('add_question',args=r.category_name))}}
+				</a>
+			    </li>
+			    {{pass}}
+			    {{pass}}
+		</ul>
+	  </li> -->
+	  <li role="presentation">
+  	     
+             
+          
+          
+<!--   <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">Add Category</button> -->
+
+  <div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Add Question Category</h4>
+        </div>
+        <div class="modal-body">
+              <form action="{{=URL('insert_category')}}">
+                      <input type="text" name="hiu_id"/>
+                  <input type="submit" value="Submit">
+                </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+          
+    </li>
+</div>
+      </li>
+      </ul>
+</div>
+<!-- <div class="btn-group" role="group" aria-label="..." style="margin-left:35%">
+  <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+    Select Category
+      <span class="caret"></span></button>
+       {{ rows = db().select(db.category.ALL) }}
+{{if len(rows):}}
+<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+{{ for r in rows: }}
+      <li>
+          {{=A(r.category_name,_href = URL('add_question',args=r.category_name))}}
+    </a></li>
+{{pass}}
+{{pass}}
+      </ul>
+ 
+
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">Add Category</button>
+
+  <div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Add Question Category</h4>
+        </div>
+        <div class="modal-body">
+              <form action="{{=URL('insert_category')}}">
+                      <input type="text" name="hiu_id"/>
+                  <input type="submit" value="Submit">
+                </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> --></div>
+<div class="row" style="margin-top:5%">
+{{=form}}
+</div>

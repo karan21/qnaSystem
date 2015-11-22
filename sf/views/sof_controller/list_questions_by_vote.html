@@ -1,0 +1,21 @@
+{{extend 'layout.html'}}
+<h2>
+    {{=category.category_name.title()}}
+</h2>
+<hr/>
+{{=A('sort by datetime',_class='btn btn-primary',_href=URL('list_questions_by_datetime',args=category.category_name))}}
+{{=A('Add Question',_class='btn btn-primary',_href=URL('add_question',args=category.category_name))}}
+<br/>
+<br/>
+{{for post in rows:}}
+<div class="well">
+    <span class="votes">{{=post.question_vote}}</span>{{=A(post.question_title,_href=URL('view_question',args=post.id))}}
+</div>
+{{pass}}
+
+{{if page>0:}}
+{{=A('previous',_class='btn btn-primary',_href=URL(args=(category.category_name,page-1)))}}
+{{pass}}
+{{if len(rows)>=10:}}
+{{=A('next',_class='btn btn-primary',_href=URL(args=(category.category_name,page+1)))}}
+{{pass}}

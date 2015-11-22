@@ -1,0 +1,75 @@
+# -*- coding: utf-8 -*-
+# try something like
+POSTS_PER_PAGE=10
+
+def index():
+    rows=db(db.category).select()
+    return locals()
+
+def getcategory():
+    category_nm=request.args(0)
+    category=db.category(category_name=category_nm)
+    if not category:
+        session.flash='requested page not found'
+        redirect(URL('index'))
+    return category
+
+@auth.requires_login()
+def add_answer():
+    question_id=request.args(0,cast=int)
+    form=SQLFORM(db.answer).process(next='view_question/[id]')
+   # form=SQLFORM(db.question).process(next='view_question/[id]')
+    return locals()
+
+@auth.requires_login()
+def add_question():
+    category=getcategory()
+    db.question.category_id.default=category.id
+    form=SQLFORM(db.question).process(next='view_question/[id]')
+    return locals()
+
+@auth.requires_login()
+def edit_question():
+    question_id=request.args(0,cast=int)
+    form=SQLFORM(db.question,question_id).process(next='view_question/[id]')
+    return locals()
+
+def list_questions_by_datetime():
+    category=getcategory()
+    page=request.args(1,cast=int,default=0)
+    start=page*POSTS_PER_PAGE
+    stop=start+POSTS_PER_PAGE
+    rows=db(db.question.category_id==category.id).select(orderby=~db.question.created_on,limitby=(start,stop))
+    return locals()
+
+def list_questions_by_vote():
+    category=getcategory()
+    page=request.args(1,cast=int,default=0)
+    start=page*POSTS_PER_PAGE
+    stop=start+POSTS_PER_PAGE
+    rows=db(db.question.category_id==category.id).select(orderby=~db.question.question_vote,limitby=(start,stop))
+    return locals()
+
+def list_questions_by_author():
+    user_id=request.args(0,cast=int)
+    page=request.args(1,cast=int,default=0)
+    rows=db(db.question.category_by==user_id).select(orderby=~db.question.created_on,limitby=(start,stop))
+    return locals()
+
+def view_question():
+    id=request.args(0,cast=int)
+    post=db.question(id) or redirect(URL('index'))
+    answers=db(db.answer.question_id==post.id).select(orderby=~db.answer.created_on)
+    return locals()
+
+@auth.requires_login()
+def vote_answer():
+    answer_id=request.args(0,cast=int)
+    direction=request.args(1)
+    return locals()
+
+@auth.requires_login()
+def vote_comm():
+    comm_id=request.args(0,cast=int)
+    direction=request.args(1)
+    return locals()
